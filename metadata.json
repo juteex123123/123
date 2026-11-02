@@ -1,0 +1,6 @@
+{
+  "name": "SLAVYAN13 — Music Portfolio",
+  "description": "Minimalist music artist portfolio featuring an interactive 3D release carousel and floating trollfaces.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
