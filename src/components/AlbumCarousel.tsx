@@ -113,7 +113,6 @@ export const AlbumCarousel: React.FC = () => {
     if (!isDragging) return;
 
     const deltaX = e.clientX - dragStartRef.current.x;
-    // Generous threshold so genuine clicks aren't cancelled by minor mouse jitter
     if (Math.abs(deltaX) > 12) {
       dragStartRef.current.moved = true;
     }
@@ -159,12 +158,19 @@ export const AlbumCarousel: React.FC = () => {
     }
   };
 
+  const safeTotal = total > 0 ? total : 1;
   const baseIndex = Math.floor(progress);
   const frac = progress - baseIndex;
   const slots = [-2, -1, 0, 1, 2];
 
-  const activeReleaseIndex = ((Math.round(progress) % total) + total) % total;
-  const currentRelease = releases[activeReleaseIndex];
+  const activeReleaseIndex = ((Math.round(progress) % safeTotal) + safeTotal) % safeTotal;
+  const currentRelease = (releases && releases[activeReleaseIndex]) || releases[0] || {
+    id: 'default',
+    title: 'SLAVYAN13',
+    subtitle: 'Artist · 2026',
+    artwork: '',
+    spotifyUrl: SPOTIFY_ARTIST_URL,
+  };
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center w-full h-full max-h-screen select-none overflow-hidden">
@@ -194,8 +200,8 @@ export const AlbumCarousel: React.FC = () => {
         >
           {slots.map((slot) => {
             const rawIndex = baseIndex + slot;
-            const itemIndex = ((rawIndex % total) + total) % total;
-            const release = releases[itemIndex];
+            const itemIndex = ((rawIndex % safeTotal) + safeTotal) % safeTotal;
+            const release = (releases && releases[itemIndex]) || currentRelease;
             const relOffset = slot - frac;
 
             // Geometry:
@@ -243,9 +249,7 @@ export const AlbumCarousel: React.FC = () => {
                   }}
                 />
 
-                {/* Cover container:
-                    For central cover: native <a> link directly opening the release URL in a new tab!
-                    For side covers: click listener smoothly shifting them to center. */}
+                {/* Cover container */}
                 {isCenter ? (
                   <a
                     href={release.spotifyUrl || SPOTIFY_ARTIST_URL}
@@ -270,6 +274,11 @@ export const AlbumCarousel: React.FC = () => {
                       draggable={false}
                       className="w-full h-full object-cover object-center select-none"
                       loading={absOffset <= 1 ? 'eager' : 'lazy'}
+                      onError={(e) => {
+                        if (release.fallbackArtwork && e.currentTarget.src !== release.fallbackArtwork) {
+                          e.currentTarget.src = release.fallbackArtwork;
+                        }
+                      }}
                     />
 
                     {/* Subtle hover sheen on center album */}
@@ -297,6 +306,11 @@ export const AlbumCarousel: React.FC = () => {
                       draggable={false}
                       className="w-full h-full object-cover object-center select-none pointer-events-none"
                       loading={absOffset <= 1 ? 'eager' : 'lazy'}
+                      onError={(e) => {
+                        if (release.fallbackArtwork && e.currentTarget.src !== release.fallbackArtwork) {
+                          e.currentTarget.src = release.fallbackArtwork;
+                        }
+                      }}
                     />
                   </div>
                 )}

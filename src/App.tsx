@@ -9,7 +9,7 @@ import { AlbumCarousel } from './components/AlbumCarousel.tsx';
 
 export default function App() {
   return (
-    <main className="fixed inset-0 w-screen h-screen h-[100dvh] bg-white overflow-hidden flex flex-col items-center justify-center">
+    <main className="relative w-full h-full min-h-screen bg-white overflow-hidden flex flex-col items-center justify-center">
       {/* Top-Left Author Information */}
       <header className="fixed top-6 sm:top-8 left-6 sm:left-8 z-30 flex flex-col text-left select-none pointer-events-auto">
         <span
